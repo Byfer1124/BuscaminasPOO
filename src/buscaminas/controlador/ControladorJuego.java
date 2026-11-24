@@ -7,6 +7,7 @@ import buscaminas.modelo.Juego;
 import buscaminas.modelo.EstadoJuego;
 import buscaminas.modelo.ResultadoDescubrimiento;
 import buscaminas.vista.VistaConsola;
+import buscaminas.excepciones.CoordenadaInvalidaException;
 
 public class ControladorJuego {
 
@@ -20,7 +21,6 @@ public class ControladorJuego {
         scanner = new Scanner(System.in);
     }
 
-    // Iniciar la partida
     public void iniciarPartida() {
 
         System.out.println("================================");
@@ -46,8 +46,11 @@ public class ControladorJuego {
 
             String coordenada = scanner.nextLine().trim().toUpperCase();
 
-            if (!esCoordenadaValida(coordenada)) {
-                System.out.println("Coordenada no válida. Intenta nuevamente.");
+            try {
+                validarCoordenada(coordenada);
+
+            } catch (CoordenadaInvalidaException e) {
+                System.out.println(e.getMessage());
                 continue;
             }
 
@@ -70,32 +73,38 @@ public class ControladorJuego {
         }
     }
 
-    // Validar coordenadas entre A1 y J10
-    //Permite comprobar que el jugador introduzca coordenadas correctas
-    private boolean esCoordenadaValida(String coordenada) {
+    private void validarCoordenada(String coordenada)
+            throws CoordenadaInvalidaException {
 
         if (coordenada == null || coordenada.length() < 2
                 || coordenada.length() > 3) {
-            return false;
+            throw new CoordenadaInvalidaException(
+                    "La coordenada debe tener formato A1 hasta J10.");
         }
 
         char letra = coordenada.charAt(0);
 
         if (letra < 'A' || letra > 'J') {
-            return false;
+            throw new CoordenadaInvalidaException(
+                    "La fila debe estar entre A y J.");
         }
 
-        try {
-            int numero = Integer.parseInt(coordenada.substring(1));
+        int numero;
 
-            return numero >= 1 && numero <= 10;
+        try {
+            numero = Integer.parseInt(coordenada.substring(1));
 
         } catch (NumberFormatException e) {
-            return false;
+            throw new CoordenadaInvalidaException(
+                    "La columna debe ser un número.");
+        }
+
+        if (numero < 1 || numero > 10) {
+            throw new CoordenadaInvalidaException(
+                    "La columna debe estar entre 1 y 10.");
         }
     }
 
-    // Procesar el descubrimiento
     private void descubrir(int fila, int columna) {
 
         ResultadoDescubrimiento resultado =
@@ -112,12 +121,12 @@ public class ControladorJuego {
                 break;
 
             case NO_DISPONIBLE:
-                System.out.println("Esta casilla ya está descubierta o marcada.");
+                System.out.println(
+                        "Esta casilla ya está descubierta o marcada.");
                 break;
         }
     }
 
-    // Procesar el marcado
     private void marcar(int fila, int columna) {
 
         boolean resultado = juego.marcarCasilla(fila, columna);
