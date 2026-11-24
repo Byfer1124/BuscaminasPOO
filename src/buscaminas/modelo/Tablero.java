@@ -1,10 +1,15 @@
 package buscaminas.modelo;
 
 import java.util.Random;
+
 import java.util.Queue;
 import java.util.LinkedList;
 
-public class Tablero {
+import java.io.Serializable;
+
+public class Tablero implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	// TAMANIO: indica que el tablero tendrá 10 filas y 10 columnas.
 	// CANTIDAD_MINAS: establece que se colocarán 10 minas.
