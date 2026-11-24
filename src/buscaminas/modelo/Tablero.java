@@ -191,4 +191,46 @@ public class Tablero {
 
 		return casillas[fila][columna].marcar();
 	}
+
+	// Contar las casillas seguras que han sido descubiertas
+	public int contarCasillasSegurasDescubiertas() {
+
+		int contador = 0;
+
+		for (int fila = 0; fila < TAMANIO; fila++) {
+			for (int columna = 0; columna < TAMANIO; columna++) {
+
+				Casilla casilla = casillas[fila][columna];
+
+				if (!casilla.tieneMina() && casilla.estaDescubierta()) {
+					contador++;
+				}
+			}
+		}
+
+		return contador;
+	}
+
+	// Comprobar si el jugador ha ganado
+	public boolean hayVictoria() {
+
+		int totalCasillasSeguras = TAMANIO * TAMANIO - CANTIDAD_MINAS;
+
+		return contarCasillasSegurasDescubiertas() == totalCasillasSeguras;
+	}
+
+	// Revelar todas las minas del tablero
+	public void revelarMinas() {
+
+		for (int fila = 0; fila < TAMANIO; fila++) {
+			for (int columna = 0; columna < TAMANIO; columna++) {
+
+				Casilla casilla = casillas[fila][columna];
+
+				if (casilla.tieneMina()) {
+					casilla.revelar();
+				}
+			}
+		}
+	}
 }
