@@ -1,7 +1,10 @@
 package buscaminas.modelo;
 
-public class Casilla {
+import java.io.Serializable;
 
+public class Casilla implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	// Utilizamos private para que otras clases no puedan modificar directamente los
 	// atributos de la casilla.
 	private boolean tieneMina;
