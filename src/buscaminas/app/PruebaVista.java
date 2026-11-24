@@ -1,11 +1,13 @@
 package buscaminas.app;
 
 import buscaminas.modelo.Juego;
+
 import buscaminas.vista.VistaConsola;
+import buscaminas.excepciones.PartidaFinalizadaException;
 
 public class PruebaVista {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws PartidaFinalizadaException {
 
         Juego juego = new Juego();
 

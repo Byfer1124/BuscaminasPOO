@@ -1,13 +1,16 @@
 package buscaminas.app;
 
 import buscaminas.modelo.Juego;
+
 import buscaminas.modelo.EstadoJuego;
 import buscaminas.modelo.Casilla;
 import buscaminas.modelo.ResultadoDescubrimiento;
 
+import buscaminas.excepciones.PartidaFinalizadaException;
+
 public class PruebaJuego {
 
-    public static void main(String[] args) {
+    public static void main(String[] args)  throws PartidaFinalizadaException {
 
         Juego juego = new Juego();
 
