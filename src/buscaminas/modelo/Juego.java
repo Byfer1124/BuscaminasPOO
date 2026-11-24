@@ -2,58 +2,56 @@
 package buscaminas.modelo;
 
 import buscaminas.excepciones.PartidaFinalizadaException;
+import java.io.Serializable;
 
-public class Juego {
+public class Juego implements Serializable {
 
-    private Tablero tablero;
-    private EstadoJuego estado;
+	private static final long serialVersionUID = 1L;
 
-    public Juego() {
-        tablero = new Tablero();
-        estado = EstadoJuego.EN_CURSO;
-    }
+	private Tablero tablero;
+	private EstadoJuego estado;
 
-    public ResultadoDescubrimiento descubrirCasilla(int fila, int columna)
-            throws PartidaFinalizadaException {
+	public Juego() {
+		tablero = new Tablero();
+		estado = EstadoJuego.EN_CURSO;
+	}
 
-        if (estado != EstadoJuego.EN_CURSO) {
-            throw new PartidaFinalizadaException(
-                    "La partida ya ha finalizado. No puedes descubrir más casillas.");
-        }
+	public ResultadoDescubrimiento descubrirCasilla(int fila, int columna) throws PartidaFinalizadaException {
 
-        ResultadoDescubrimiento resultado =
-                tablero.descubrirCasilla(fila, columna);
+		if (estado != EstadoJuego.EN_CURSO) {
+			throw new PartidaFinalizadaException("La partida ya ha finalizado. No puedes descubrir más casillas.");
+		}
 
-        if (resultado == ResultadoDescubrimiento.MINA) {
-            estado = EstadoJuego.PERDIDO;
-            tablero.revelarMinas();
+		ResultadoDescubrimiento resultado = tablero.descubrirCasilla(fila, columna);
 
-        } else if (resultado == ResultadoDescubrimiento.DESCUBIERTA) {
+		if (resultado == ResultadoDescubrimiento.MINA) {
+			estado = EstadoJuego.PERDIDO;
+			tablero.revelarMinas();
 
-            if (tablero.hayVictoria()) {
-                estado = EstadoJuego.GANADO;
-            }
-        }
+		} else if (resultado == ResultadoDescubrimiento.DESCUBIERTA) {
 
-        return resultado;
-    }
+			if (tablero.hayVictoria()) {
+				estado = EstadoJuego.GANADO;
+			}
+		}
 
-    public boolean marcarCasilla(int fila, int columna)
-            throws PartidaFinalizadaException {
+		return resultado;
+	}
 
-        if (estado != EstadoJuego.EN_CURSO) {
-            throw new PartidaFinalizadaException(
-                    "La partida ya ha finalizado. No puedes marcar casillas.");
-        }
+	public boolean marcarCasilla(int fila, int columna) throws PartidaFinalizadaException {
 
-        return tablero.marcarCasilla(fila, columna);
-    }
+		if (estado != EstadoJuego.EN_CURSO) {
+			throw new PartidaFinalizadaException("La partida ya ha finalizado. No puedes marcar casillas.");
+		}
 
-    public EstadoJuego getEstado() {
-        return estado;
-    }
+		return tablero.marcarCasilla(fila, columna);
+	}
 
-    public Tablero getTablero() {
-        return tablero;
-    }
+	public EstadoJuego getEstado() {
+		return estado;
+	}
+
+	public Tablero getTablero() {
+		return tablero;
+	}
 }
