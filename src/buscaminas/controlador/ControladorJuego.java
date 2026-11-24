@@ -10,6 +10,9 @@ import buscaminas.vista.VistaConsola;
 import buscaminas.excepciones.CoordenadaInvalidaException;
 
 import buscaminas.excepciones.PartidaFinalizadaException;
+import java.io.IOException;
+import buscaminas.persistencia.PersistenciaJuego;
+import buscaminas.persistencia.PersistenciaSerializada;
 
 public class ControladorJuego {
 
@@ -17,10 +20,13 @@ public class ControladorJuego {
 	private VistaConsola vista;
 	private Scanner scanner;
 
+	private PersistenciaJuego persistencia;
+
 	public ControladorJuego() {
 		juego = new Juego();
 		vista = new VistaConsola();
 		scanner = new Scanner(System.in);
+		persistencia = new PersistenciaSerializada();
 	}
 
 	public void iniciarPartida() {
@@ -35,12 +41,24 @@ public class ControladorJuego {
 
 			System.out.println("\n1. Descubrir casilla");
 			System.out.println("2. Marcar / desmarcar casilla");
+			System.out.println("3. Guardar partida");
+			System.out.println("4. Cargar partida");
 			System.out.print("\nSelecciona una opción: ");
 
 			String opcion = scanner.nextLine().trim();
 
-			if (!opcion.equals("1") && !opcion.equals("2")) {
+			if (!opcion.equals("1") && !opcion.equals("2") && !opcion.equals("3") && !opcion.equals("4")) {
 				System.out.println("Opción no válida.");
+				continue;
+			}
+
+			if (opcion.equals("3")) {
+				guardarPartida();
+				continue;
+			}
+
+			if (opcion.equals("4")) {
+				cargarPartida();
 				continue;
 			}
 
@@ -72,6 +90,41 @@ public class ControladorJuego {
 			System.out.println("\n¡FELICIDADES! HAS GANADO.");
 		} else {
 			System.out.println("\n¡HAS PERDIDO! Encontraste una mina.");
+		}
+	}
+
+	// Utiliza el atributo persistencia para guardar la partida actual.
+	// Guarda el archivo con el nombre partida.dat.
+	// Si ocurre un error de escritura, captura la excepción IOException y muestra
+	// un mensaje.
+
+	private void guardarPartida() {
+
+		try {
+			persistencia.guardar(juego, "partida.dat");
+			System.out.println("Partida guardada correctamente.");
+
+		} catch (IOException e) {
+			System.out.println("Error al guardar la partida: " + e.getMessage());
+		}
+	}
+
+     //persistencia.cargar("partida.dat"): recupera el objeto Juego desde el archivo.
+     //juego =: reemplaza la partida que estaba utilizando el controlador por la partida recuperada.
+     //IOException: controla problemas al leer el archivo.
+     //ClassNotFoundException: controla problemas al encontrar la clase del objeto almacenado.
+	
+	private void cargarPartida() {
+
+		try {
+			juego = persistencia.cargar("partida.dat");
+			System.out.println("Partida cargada correctamente.");
+
+		} catch (IOException e) {
+			System.out.println("No se pudo cargar la partida: " + e.getMessage());
+
+		} catch (ClassNotFoundException e) {
+			System.out.println("No se pudo reconocer el objeto guardado.");
 		}
 	}
 
