@@ -1,4 +1,7 @@
+
 package buscaminas.modelo;
+
+import buscaminas.excepciones.PartidaFinalizadaException;
 
 public class Juego {
 
@@ -10,15 +13,12 @@ public class Juego {
         estado = EstadoJuego.EN_CURSO;
     }
 
-    // Descubrir una casilla
-    //Este método delega el descubrimiento al tablero y recibe el resultado.
-    //Si encuentra una mina, cambia el estado a PERDIDO y revela las minas.
-    //Si descubre una casilla segura, comprueba si se alcanzó la victoria.
-    //Si la partida ya terminó, no permite continuar jugando.
-    public ResultadoDescubrimiento descubrirCasilla(int fila, int columna) {
+    public ResultadoDescubrimiento descubrirCasilla(int fila, int columna)
+            throws PartidaFinalizadaException {
 
         if (estado != EstadoJuego.EN_CURSO) {
-            return ResultadoDescubrimiento.NO_DISPONIBLE;
+            throw new PartidaFinalizadaException(
+                    "La partida ya ha finalizado. No puedes descubrir más casillas.");
         }
 
         ResultadoDescubrimiento resultado =
@@ -38,22 +38,21 @@ public class Juego {
         return resultado;
     }
 
-    // Marcar o desmarcar una casilla
-    public boolean marcarCasilla(int fila, int columna) {
+    public boolean marcarCasilla(int fila, int columna)
+            throws PartidaFinalizadaException {
 
         if (estado != EstadoJuego.EN_CURSO) {
-            return false;
+            throw new PartidaFinalizadaException(
+                    "La partida ya ha finalizado. No puedes marcar casillas.");
         }
 
         return tablero.marcarCasilla(fila, columna);
     }
 
-    // Obtener el estado actual de la partida
     public EstadoJuego getEstado() {
         return estado;
     }
 
-    // Obtener el tablero
     public Tablero getTablero() {
         return tablero;
     }
