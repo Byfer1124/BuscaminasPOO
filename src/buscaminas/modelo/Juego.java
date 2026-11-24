@@ -11,6 +11,10 @@ public class Juego {
     }
 
     // Descubrir una casilla
+    //Este método delega el descubrimiento al tablero y recibe el resultado.
+    //Si encuentra una mina, cambia el estado a PERDIDO y revela las minas.
+    //Si descubre una casilla segura, comprueba si se alcanzó la victoria.
+    //Si la partida ya terminó, no permite continuar jugando.
     public ResultadoDescubrimiento descubrirCasilla(int fila, int columna) {
 
         if (estado != EstadoJuego.EN_CURSO) {
