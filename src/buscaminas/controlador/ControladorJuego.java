@@ -2,196 +2,217 @@
 package buscaminas.controlador;
 
 import java.util.Scanner;
+import java.io.IOException;
 
 import buscaminas.modelo.Juego;
 import buscaminas.modelo.EstadoJuego;
 import buscaminas.modelo.ResultadoDescubrimiento;
 import buscaminas.vista.VistaConsola;
 import buscaminas.excepciones.CoordenadaInvalidaException;
-
 import buscaminas.excepciones.PartidaFinalizadaException;
-import java.io.IOException;
 import buscaminas.persistencia.PersistenciaJuego;
 import buscaminas.persistencia.PersistenciaSerializada;
 
 public class ControladorJuego {
 
-	private Juego juego;
-	private VistaConsola vista;
-	private Scanner scanner;
+    private Juego juego;
+    private VistaConsola vista;
+    private Scanner scanner;
 
-	private PersistenciaJuego persistencia;
+    private PersistenciaJuego persistencia;
 
-	public ControladorJuego() {
-		juego = new Juego();
-		vista = new VistaConsola();
-		scanner = new Scanner(System.in);
-		persistencia = new PersistenciaSerializada();
-	}
+    public ControladorJuego() {
+        juego = new Juego();
+        vista = new VistaConsola();
+        scanner = new Scanner(System.in);
+        persistencia = new PersistenciaSerializada();
+    }
 
-	public void iniciarPartida() {
+    public void iniciarPartida() {
 
-		System.out.println("================================");
-		System.out.println("          BUSCAMINAS");
-		System.out.println("================================");
+        boolean salir = false;
 
-		while (juego.getEstado() == EstadoJuego.EN_CURSO) {
+        System.out.println("================================");
+        System.out.println("          BUSCAMINAS");
+        System.out.println("================================");
 
-			vista.mostrarTablero(juego.getTablero());
+        while (juego.getEstado() == EstadoJuego.EN_CURSO && !salir) {
 
-			System.out.println("\n1. Descubrir casilla");
-			System.out.println("2. Marcar / desmarcar casilla");
-			System.out.println("3. Guardar partida");
-			System.out.println("4. Cargar partida");
-			System.out.print("\nSelecciona una opción: ");
+            vista.mostrarTablero(juego.getTablero());
 
-			String opcion = scanner.nextLine().trim();
+            System.out.println("\n1. Descubrir casilla");
+            System.out.println("2. Marcar / desmarcar casilla");
+            System.out.println("3. Guardar partida");
+            System.out.println("4. Cargar partida");
+            System.out.println("5. Reglas del juego");
+            System.out.println("6. Salir del juego");
+            System.out.print("\nSelecciona una opción: ");
 
-			if (!opcion.equals("1") && !opcion.equals("2") && !opcion.equals("3") && !opcion.equals("4")) {
-				System.out.println("Opción no válida.");
-				continue;
-			}
+            String opcion = scanner.nextLine().trim();
 
-			if (opcion.equals("3")) {
-				guardarPartida();
-				continue;
-			}
+            if (!opcion.equals("1") && !opcion.equals("2")
+                    && !opcion.equals("3") && !opcion.equals("4")
+                    && !opcion.equals("5") && !opcion.equals("6")) {
 
-			if (opcion.equals("4")) {
-				cargarPartida();
-				continue;
-			}
+                System.out.println("Opción no válida.");
+                continue;
+            }
 
-			System.out.print("Introduce una coordenada (ejemplo A5): ");
+            if (opcion.equals("3")) {
+                guardarPartida();
+                continue;
+            }
 
-			String coordenada = scanner.nextLine().trim().toUpperCase();
+            if (opcion.equals("4")) {
+                cargarPartida();
+                continue;
+            }
 
-			try {
-				validarCoordenada(coordenada);
+            if (opcion.equals("5")) {
+                vista.mostrarReglas();
+                continue;
+            }
 
-			} catch (CoordenadaInvalidaException e) {
-				System.out.println(e.getMessage());
-				continue;
-			}
+            if (opcion.equals("6")) {
+                salir = true;
+                continue;
+            }
 
-			int fila = coordenada.charAt(0) - 'A';
-			int columna = Integer.parseInt(coordenada.substring(1)) - 1;
+            System.out.print("Introduce una coordenada (ejemplo A5): ");
 
-			if (opcion.equals("1")) {
-				descubrir(fila, columna);
-			} else {
-				marcar(fila, columna);
-			}
-		}
+            String coordenada = scanner.nextLine().trim().toUpperCase();
 
-		vista.mostrarTablero(juego.getTablero());
+            try {
+                validarCoordenada(coordenada);
 
-		if (juego.getEstado() == EstadoJuego.GANADO) {
-			System.out.println("\n¡FELICIDADES! HAS GANADO.");
-		} else {
-			System.out.println("\n¡HAS PERDIDO! Encontraste una mina.");
-		}
-	}
+            } catch (CoordenadaInvalidaException e) {
+                System.out.println(e.getMessage());
+                continue;
+            }
 
-	// Utiliza el atributo persistencia para guardar la partida actual.
-	// Guarda el archivo con el nombre partida.dat.
-	// Si ocurre un error de escritura, captura la excepción IOException y muestra
-	// un mensaje.
+            int fila = coordenada.charAt(0) - 'A';
+            int columna = Integer.parseInt(coordenada.substring(1)) - 1;
 
-	private void guardarPartida() {
+            if (opcion.equals("1")) {
+                descubrir(fila, columna);
+            } else {
+                marcar(fila, columna);
+            }
+        }
 
-		try {
-			persistencia.guardar(juego, "partida.dat");
-			System.out.println("Partida guardada correctamente.");
+        // Si el jugador decide salir, no se muestra victoria ni derrota.
+        if (salir) {
+            System.out.println("\nHas salido del juego. ¡Hasta pronto!");
+            return;
+        }
 
-		} catch (IOException e) {
-			System.out.println("Error al guardar la partida: " + e.getMessage());
-		}
-	}
+        vista.mostrarTablero(juego.getTablero());
 
-     //persistencia.cargar("partida.dat"): recupera el objeto Juego desde el archivo.
-     //juego =: reemplaza la partida que estaba utilizando el controlador por la partida recuperada.
-     //IOException: controla problemas al leer el archivo.
-     //ClassNotFoundException: controla problemas al encontrar la clase del objeto almacenado.
-	
-	private void cargarPartida() {
+        if (juego.getEstado() == EstadoJuego.GANADO) {
+            System.out.println("\n¡FELICIDADES! HAS GANADO.");
+        } else {
+            System.out.println("\n¡HAS PERDIDO! Encontraste una mina.");
+        }
+    }
 
-		try {
-			juego = persistencia.cargar("partida.dat");
-			System.out.println("Partida cargada correctamente.");
+    private void guardarPartida() {
 
-		} catch (IOException e) {
-			System.out.println("No se pudo cargar la partida: " + e.getMessage());
+        try {
+            persistencia.guardar(juego, "partida.dat");
+            System.out.println("Partida guardada correctamente.");
 
-		} catch (ClassNotFoundException e) {
-			System.out.println("No se pudo reconocer el objeto guardado.");
-		}
-	}
+        } catch (IOException e) {
+            System.out.println("Error al guardar la partida: " + e.getMessage());
+        }
+    }
 
-	private void validarCoordenada(String coordenada) throws CoordenadaInvalidaException {
+    private void cargarPartida() {
 
-		if (coordenada == null || coordenada.length() < 2 || coordenada.length() > 3) {
-			throw new CoordenadaInvalidaException("La coordenada debe tener formato A1 hasta J10.");
-		}
+        try {
+            juego = persistencia.cargar("partida.dat");
+            System.out.println("Partida cargada correctamente.");
 
-		char letra = coordenada.charAt(0);
+        } catch (IOException e) {
+            System.out.println("No se pudo cargar la partida: " + e.getMessage());
 
-		if (letra < 'A' || letra > 'J') {
-			throw new CoordenadaInvalidaException("La fila debe estar entre A y J.");
-		}
+        } catch (ClassNotFoundException e) {
+            System.out.println("No se pudo reconocer el objeto guardado.");
+        }
+    }
 
-		int numero;
+    private void validarCoordenada(String coordenada)
+            throws CoordenadaInvalidaException {
 
-		try {
-			numero = Integer.parseInt(coordenada.substring(1));
+        if (coordenada == null || coordenada.length() < 2
+                || coordenada.length() > 3) {
 
-		} catch (NumberFormatException e) {
-			throw new CoordenadaInvalidaException("La columna debe ser un número.");
-		}
+            throw new CoordenadaInvalidaException(
+                    "La coordenada debe tener formato A1 hasta J10.");
+        }
 
-		if (numero < 1 || numero > 10) {
-			throw new CoordenadaInvalidaException("La columna debe estar entre 1 y 10.");
-		}
-	}
+        char letra = coordenada.charAt(0);
 
-	private void descubrir(int fila, int columna) {
+        if (letra < 'A' || letra > 'J') {
+            throw new CoordenadaInvalidaException(
+                    "La fila debe estar entre A y J.");
+        }
 
-		try {
-			ResultadoDescubrimiento resultado = juego.descubrirCasilla(fila, columna);
+        int numero;
 
-			switch (resultado) {
+        try {
+            numero = Integer.parseInt(coordenada.substring(1));
 
-			case DESCUBIERTA:
-				System.out.println("Casilla descubierta.");
-				break;
+        } catch (NumberFormatException e) {
+            throw new CoordenadaInvalidaException(
+                    "La columna debe ser un número.");
+        }
 
-			case MINA:
-				System.out.println("¡Cuidado! Descubriste una mina.");
-				break;
+        if (numero < 1 || numero > 10) {
+            throw new CoordenadaInvalidaException(
+                    "La columna debe estar entre 1 y 10.");
+        }
+    }
 
-			case NO_DISPONIBLE:
-				System.out.println("Esta casilla ya está descubierta o marcada.");
-				break;
-			}
+    private void descubrir(int fila, int columna) {
 
-		} catch (PartidaFinalizadaException e) {
-			System.out.println(e.getMessage());
-		}
-	}
+        try {
+            ResultadoDescubrimiento resultado =
+                    juego.descubrirCasilla(fila, columna);
 
-	private void marcar(int fila, int columna) {
+            switch (resultado) {
 
-		try {
-			boolean resultado = juego.marcarCasilla(fila, columna);
+            case DESCUBIERTA:
+                System.out.println("Casilla descubierta.");
+                break;
 
-			if (resultado) {
-				System.out.println("Estado de la marca actualizado.");
-			} else {
-				System.out.println("No se puede marcar esta casilla.");
-			}
+            case MINA:
+                System.out.println("¡Cuidado! Descubriste una mina.");
+                break;
 
-		} catch (PartidaFinalizadaException e) {
-			System.out.println(e.getMessage());
-		}
-	}
+            case NO_DISPONIBLE:
+                System.out.println(
+                        "Esta casilla ya está descubierta o marcada.");
+                break;
+            }
+
+        } catch (PartidaFinalizadaException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void marcar(int fila, int columna) {
+
+        try {
+            boolean resultado = juego.marcarCasilla(fila, columna);
+
+            if (resultado) {
+                System.out.println("Estado de la marca actualizado.");
+            } else {
+                System.out.println("No se puede marcar esta casilla.");
+            }
+
+        } catch (PartidaFinalizadaException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }
