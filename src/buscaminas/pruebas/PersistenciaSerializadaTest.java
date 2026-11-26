@@ -87,4 +87,25 @@ class PersistenciaSerializadaTest {
 			Files.deleteIfExists(Path.of(ruta));
 		}
 	}
+
+	@Test
+	void noPermitirGuardarConRutaVacia() {
+
+		PersistenciaSerializada persistencia = new PersistenciaSerializada();
+		Juego juego = new Juego();
+
+		assertThrows(IllegalArgumentException.class, () -> {
+			persistencia.guardar(juego, "");
+		});
+	}
+
+	@Test
+	void noPermitirCargarConRutaVacia() {
+
+		PersistenciaSerializada persistencia = new PersistenciaSerializada();
+
+		assertThrows(IllegalArgumentException.class, () -> {
+			persistencia.cargar("");
+		});
+	}
 }

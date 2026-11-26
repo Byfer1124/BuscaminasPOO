@@ -53,6 +53,18 @@ class TableroTest {
             tablero.getCasilla(0, 10);
         });
     }
+    
+    @Test
+    void verificarCoordenadasNegativas() {
+
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            tablero.getCasilla(-1, 0);
+        });
+
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            tablero.getCasilla(0, -1);
+        });
+    }
 
     @Test
     void verificarMarcadoYDesmarcado() {
