@@ -16,12 +16,11 @@ public class PersistenciaSerializada implements PersistenciaJuego {
 	@Override
 	public void guardar(Juego juego, String ruta) throws IOException {
 
-		// FileOutputStream: Crea o abre el archivo donde se guardará la partida.
-		// ObjectOutputStream: Permite escribir objetos Java en formato binario.
-		// writeObject(juego): Guarda el objeto Juego completo, incluyendo su tablero y
-		// estado.
-		// try-with-resources: Cierra automáticamente el archivo al terminar, incluso si
-		// ocurre un error.
+		//comprueba que la ruta no sea nula.
+		//comprueba que no esté vacía ni contenga únicamente espacios.
+		if (ruta == null || ruta.isBlank()) {
+			throw new IllegalArgumentException("La ruta de guardado no puede estar vacía.");//informa que el argumento recibido no es válido.
+		}
 
 		try (ObjectOutputStream salida = new ObjectOutputStream(new FileOutputStream(ruta))) {
 
@@ -31,6 +30,10 @@ public class PersistenciaSerializada implements PersistenciaJuego {
 
 	@Override
 	public Juego cargar(String ruta) throws IOException, ClassNotFoundException {
+
+		if (ruta == null || ruta.isBlank()) {
+			throw new IllegalArgumentException("La ruta de carga no puede estar vacía.");
+		}
 
 		try (ObjectInputStream entrada = new ObjectInputStream(new FileInputStream(ruta))) {
 
